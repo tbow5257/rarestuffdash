@@ -3,6 +3,7 @@ import { gql, useQuery } from "@apollo/client";
 import zorderBy from "lodash/orderBy";
 import { makeStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
@@ -96,19 +97,23 @@ const transformToDisplayPrice = (wholeNum: number) =>
 export default function Wut() {
   const classes = useStyles();
 
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: any) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+  const handleRequestSort = (
+    event: React.MouseEvent<unknown>,
+    property: any
+  ) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
-  const createSortHandler = (property: any) => (event: React.MouseEvent<unknown>) => {
+  const createSortHandler = (property: any) => (
+    event: React.MouseEvent<unknown>
+  ) => {
     handleRequestSort(event, property);
   };
 
-
-  const [order, setOrder] = React.useState<Order>('desc');
-  const [orderBy, setOrderBy] = React.useState('price');
+  const [order, setOrder] = React.useState<Order>("desc");
+  const [orderBy, setOrderBy] = React.useState("price");
 
   const { loading, error, data } = useQuery(ALL_ALBUMS);
 
@@ -121,26 +126,31 @@ export default function Wut() {
           <TableHead>
             <TableRow>
               {headCells.map((headCell) => (
-                <TableCell onClick={createSortHandler(headCell)}
-                 >
-                     {headCell}
-                     </TableCell>
+                <TableCell >
+                  <TableSortLabel
+                    active={orderBy === headCell}
+                    direction={orderBy === headCell ? order : 'asc'}
+                    onClick={createSortHandler(headCell)}
+                        >{headCell}</TableSortLabel>
+                </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {stableSort(data.albums, getComparator(order, orderBy)).map((album: any) => (
-              <TableRow>
-                <TableCell>{album.releaseId}</TableCell>
-                <TableCell>{album.name}</TableCell>
-                <TableCell>Want:{album.want}</TableCell>
-                <TableCell>Have:{album.have}</TableCell>
-                <TableCell>
-                  price: ${transformToDisplayPrice(album.price)}
-                </TableCell>
-                <TableCell>{album.style}</TableCell>
-              </TableRow>
-            ))}
+            {stableSort(data.albums, getComparator(order, orderBy)).map(
+              (album: any) => (
+                <TableRow>
+                  <TableCell>{album.releaseId}</TableCell>
+                  <TableCell>{album.name}</TableCell>
+                  <TableCell>Want:{album.want}</TableCell>
+                  <TableCell>Have:{album.have}</TableCell>
+                  <TableCell>
+                    price: ${transformToDisplayPrice(album.price)}
+                  </TableCell>
+                  <TableCell>{album.style}</TableCell>
+                </TableRow>
+              )
+            )}
           </TableBody>
         </Table>
       </TableContainer>
