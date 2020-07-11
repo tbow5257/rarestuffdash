@@ -12,19 +12,15 @@ import Paper from "@material-ui/core/Paper";
 
 const ALL_ALBUMS = gql`
   query {
-    allAlbums {
-      edges {
-        node {
-          id
-          name
-          releaseId
-          price
-          style
-          have
-          want
-          style
-        }
-      }
+    albums {
+      id
+      name
+      releaseId
+      price
+      style
+      have
+      want
+      style
     }
   }
 `;
@@ -33,7 +29,7 @@ interface Edge {
   node: Node;
 }
 
-interface Node {
+interface Album {
   id: string;
   releaseId: string;
   name: string;
@@ -43,7 +39,14 @@ interface Node {
   price: number;
 }
 
-const headCells: string[] = ["releaseId", "name", "want", "have", "price", "style"];
+const headCells: string[] = [
+  "releaseId",
+  "name",
+  "want",
+  "have",
+  "price",
+  "style",
+];
 
 const useStyles = makeStyles({
   table: {
@@ -64,8 +67,8 @@ export default function Wut() {
   if (loading) return <div>Load time</div>;
 
   const meOrdered = orderBy(
-    data.allAlbums.edges,
-    (edge) => edge.node.want,
+    data.albums,
+    (album) => album.want,
     "desc"
   );
   console.log("mo", meOrdered);
@@ -82,16 +85,16 @@ export default function Wut() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {meOrdered.map((edge: Edge) => (
+            {meOrdered.map((album: Album) => (
               <TableRow>
-                <TableCell>{edge.node.releaseId}</TableCell>
-                <TableCell>{edge.node.name}</TableCell>
-                <TableCell>Want:{edge.node.want}</TableCell>
-                <TableCell>Have:{edge.node.have}</TableCell>
+                <TableCell>{album.releaseId}</TableCell>
+                <TableCell>{album.name}</TableCell>
+                <TableCell>Want:{album.want}</TableCell>
+                <TableCell>Have:{album.have}</TableCell>
                 <TableCell>
-                  price: ${transformToDisplayPrice(edge.node.price)}
+                  price: ${transformToDisplayPrice(album.price)}
                 </TableCell>
-                <TableCell>{edge.node.style}</TableCell>
+                <TableCell>{album.style}</TableCell>
               </TableRow>
             ))}
           </TableBody>
