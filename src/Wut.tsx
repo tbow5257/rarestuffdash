@@ -6,6 +6,7 @@ import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
+import TablePagination from "@material-ui/core/TablePagination";
 import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
 import Table from "@material-ui/core/Table";
@@ -97,6 +98,16 @@ const transformToDisplayPrice = (wholeNum: number) =>
 export default function Wut() {
   const classes = useStyles();
 
+  const [selected, setSelected] = React.useState<string[]>([]);
+  const [page, setPage] = React.useState(0);
+  const [order, setOrder] = React.useState<Order>("desc");
+  const [orderBy, setOrderBy] = React.useState("have");
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const { loading, error, data } = useQuery(ALL_ALBUMS);
+
+  if (loading) return <div>Load time</div>;
+
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: any
@@ -112,33 +123,60 @@ export default function Wut() {
     handleRequestSort(event, property);
   };
 
-  const [order, setOrder] = React.useState<Order>("desc");
-  const [orderBy, setOrderBy] = React.useState("price");
+  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
+    const selectedIndex = selected.indexOf(name);
+    let newSelected: string[] = [];
 
-  const { loading, error, data } = useQuery(ALL_ALBUMS);
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, name);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
 
-  if (loading) return <div>Load time</div>;
+    setSelected(newSelected);
+  };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <div>
       <TableContainer component={Paper}>
-        <Table className={classes.table}>
+        <Table className={classes.table} size={"small"}>
           <TableHead>
             <TableRow>
               {headCells.map((headCell) => (
-                <TableCell >
+                <TableCell>
                   <TableSortLabel
                     active={orderBy === headCell}
-                    direction={orderBy === headCell ? order : 'asc'}
+                    direction={orderBy === headCell ? order : "asc"}
                     onClick={createSortHandler(headCell)}
-                        >{headCell}</TableSortLabel>
+                  >
+                    {headCell}
+                  </TableSortLabel>
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {stableSort(data.albums, getComparator(order, orderBy)).map(
-              (album: any) => (
+            {stableSort(data.albums, getComparator(order, orderBy))
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((album: any) => (
                 <TableRow>
                   <TableCell>{album.releaseId}</TableCell>
                   <TableCell>{album.name}</TableCell>
@@ -149,11 +187,19 @@ export default function Wut() {
                   </TableCell>
                   <TableCell>{album.style}</TableCell>
                 </TableRow>
-              )
-            )}
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={data.albums.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+      />
     </div>
   );
 }
