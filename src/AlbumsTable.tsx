@@ -1,31 +1,20 @@
 import React from "react";
-import { gql, useQuery } from "@apollo/client";
-import zorderBy from "lodash/orderBy";
+import { useQuery } from "@apollo/client";
+import cloneDeep from "lodash/cloneDeep";
 import { makeStyles } from "@material-ui/core/styles";
-import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
-import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
 import Table from "@material-ui/core/Table";
 import Paper from "@material-ui/core/Paper";
+import MaterialTable from "material-table";
+import { parse } from "query-string";
 
-const ALL_ALBUMS = gql`
-  query {
-    albums {
-      id
-      name
-      releaseId
-      price
-      style
-      have
-      want
-      style
-    }
-  }
-`;
+import { ALL_ALBUMS } from "./Queries";
+import { decodeURLString } from "./Helpers";
+import StyleList from "./StyleList";
 
 interface Edge {
   node: Node;
@@ -74,15 +63,15 @@ function getComparator<Key extends keyof any>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
+// function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
+//   const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
+//   stabilizedThis.sort((a, b) => {
+//     const order = comparator(a[0], b[0]);
+//     if (order !== 0) return order;
+//     return a[1] - b[1];
+//   });
+//   return stabilizedThis.map((el) => el[0]);
+// }
 
 const useStyles = makeStyles({
   table: {
@@ -95,7 +84,7 @@ const useStyles = makeStyles({
 const transformToDisplayPrice = (wholeNum: number) =>
   (wholeNum / 100).toFixed(2);
 
-export default function Wut() {
+export default function AlbumsTable() {
   const classes = useStyles();
 
   const [selected, setSelected] = React.useState<string[]>([]);
@@ -103,10 +92,20 @@ export default function Wut() {
   const [order, setOrder] = React.useState<Order>("desc");
   const [orderBy, setOrderBy] = React.useState("have");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [searchField, setSearchField] = React.useState("experimental");
 
   const { loading, error, data } = useQuery(ALL_ALBUMS);
 
   if (loading) return <div>Load time</div>;
+
+  console.log("data ", data);
+
+  const albumsCopy = cloneDeep(data.albums);
+
+  albumsCopy.forEach((element: Album) => {
+    element.name = decodeURLString(element.name);
+    element.style = decodeURLString(element.style);
+  });
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -156,7 +155,20 @@ export default function Wut() {
 
   return (
     <div>
-      <TableContainer component={Paper}>
+      <MaterialTable
+        columns={[
+          { title: "Release Id", field: "releaseId" },
+          { title: "Name", field: "name" },
+          { title: "# Want", field: "want" },
+          { title: "# Have", field: "have" },
+          { title: "Rare Price", field: "price" },
+          { title: "Style", field: "style" },
+        ]}
+        data={albumsCopy}
+        options={{ searchText: searchField }}
+        title="Albums table"
+      />
+      {/* <TableContainer component={Paper}>
         <Table className={classes.table} size={"small"}>
           <TableHead>
             <TableRow>
@@ -199,7 +211,7 @@ export default function Wut() {
         page={page}
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
-      />
+      /> */}
     </div>
   );
 }
