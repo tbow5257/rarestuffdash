@@ -4,8 +4,10 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import { makeStyles } from "@material-ui/core/styles";
+import cloneDeep from "lodash/cloneDeep";
 
 import { ALL_STYLES } from "./Queries";
+import { decodeURLString } from './Helpers';
 
 interface Style {
   name: string;
@@ -24,10 +26,16 @@ export default function StyleList() {
 
   if (loading) return <div>Loadin</div>;
 
+  const stylesCopy = cloneDeep(data.styles);
+
+  stylesCopy.forEach((style: Style) => {
+    style.name = decodeURLString(style.name)
+  });
+
   return (
     <TableContainer>
     <TableRow >
-      {data.styles.map((style: Style, i: number) => (
+      {stylesCopy.map((style: Style, i: number) => (
         <TableCell key={i}>{style.name}</TableCell>
       ))}
     </TableRow>
