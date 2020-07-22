@@ -39,7 +39,6 @@ const headCells: string[] = [
   "style",
 ];
 
-
 type Order = "asc" | "desc";
 
 const useStyles = makeStyles({
@@ -50,10 +49,13 @@ const useStyles = makeStyles({
   },
 });
 
+interface AlbumsProps {
+  searchStyle: string;
+}
 
-export default function AlbumsTable() {
+export default function AlbumsTable({ searchStyle }: AlbumsProps) {
   const classes = useStyles();
-
+  console.log('serach', searchStyle);
   const [selected, setSelected] = React.useState<string[]>([]);
   const [page, setPage] = React.useState(0);
   const [order, setOrder] = React.useState<Order>("desc");
@@ -61,6 +63,9 @@ export default function AlbumsTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [searchField, setSearchField] = React.useState("experimental");
 
+  React.useEffect(() => {
+    setSearchField(searchStyle)
+  }, [searchStyle])
   const { loading, error, data } = useQuery(ALL_ALBUMS);
 
   if (loading) return <div>Load time</div>;
@@ -109,6 +114,7 @@ export default function AlbumsTable() {
 
   return (
     <div>
+      <div>{searchStyle}</div>
       <MaterialTable
         columns={[
           { title: "Release Id", field: "releaseId" },

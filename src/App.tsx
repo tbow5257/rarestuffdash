@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, Dispatch } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import {
@@ -15,19 +15,20 @@ import StyleList from './StyleList';
 const client = new ApolloClient({
   cache: new InMemoryCache(),
   link: new HttpLink({
-    uri: "http://127.0.0.1:8000/graphql",
-    credentials: "same-origin",
+    uri: "https://secret-bastion-33730.herokuapp.com/graphql",
   }),
 });
 
+type SetStyle = string;
 
 function App() {
-
+  const [searchStyle, setSearchStyle] = useState<SetStyle>('');
+  
   return (
     <ApolloProvider client={client}>
       <div className="App">
-        <StyleList />
-        <AlbumsTable />
+        <StyleList setSearchStyle={setSearchStyle} />
+        <AlbumsTable searchStyle={searchStyle} />
       </div>
     </ApolloProvider>
   );
