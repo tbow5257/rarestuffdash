@@ -12,10 +12,11 @@ import {
 import AlbumsTable from './AlbumsTable';
 import StyleList from './StyleList';
 
+console.log(process.env)
 const client = new ApolloClient({
   cache: new InMemoryCache(),
   link: new HttpLink({
-    uri: "https://secret-bastion-33730.herokuapp.com/graphql",
+    uri: process.env.REACT_APP_REMOTE_API,
   }),
 });
 
