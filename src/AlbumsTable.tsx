@@ -4,7 +4,7 @@ import cloneDeep from "lodash/cloneDeep";
 import { makeStyles } from "@material-ui/core/styles";
 import MaterialTable from "material-table";
 
-import { ALL_ALBUMS } from "./Queries";
+import { ALL_ALBUMS, SEARCH_ALBUMS_PAGINATE } from "./Queries";
 import { decodeURLString } from "./Helpers";
 
 interface Edge {
@@ -40,14 +40,26 @@ export default function AlbumsTable({ searchStyle }: AlbumsProps) {
   useStyles();
   const [searchField, setSearchField] = React.useState("experimental");
 
-  React.useEffect(() => {
-    setSearchField(searchStyle)
-  }, [searchStyle])
-  const { loading, data } = useQuery(ALL_ALBUMS);
+  const clicky = () => {
+    console.log('WHY');
+    setSearchField('folk');
+  }
 
+  // const { loading, data } = useQuery(ALL_ALBUMS);
+
+  const { loading, error, data } = useQuery(SEARCH_ALBUMS_PAGINATE, { variables:
+    { "minHaveCount": 30, "maxHaveCount": 50, "first": 100, "skip": 0, "style":"Folk" }
+  });
+
+  console.log('error ', error);
   if (loading) return <div>Load time</div>;
 
-  const albumsCopy = cloneDeep(data.albums);
+
+  console.log("huh ", data)
+
+  // const albumsCopy = cloneDeep(data.albums);
+
+  const albumsCopy = cloneDeep(data.albumsByHave.edges);
 
   albumsCopy.forEach((element: Album) => {
     element.name = decodeURLString(element.name);
@@ -57,6 +69,7 @@ export default function AlbumsTable({ searchStyle }: AlbumsProps) {
   return (
     <div>
       <div>{searchStyle}</div>
+      <div onClick={clicky}>{data.albumsByHave.totalCount}</div>
       <MaterialTable
         columns={[
           { title: "Release Id", field: "releaseId" },
