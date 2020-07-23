@@ -5,7 +5,6 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import { makeStyles } from "@material-ui/core/styles";
 import cloneDeep from "lodash/cloneDeep";
-import Button from "@material-ui/core/Button";
 
 import { ALL_STYLES } from "./Queries";
 import { decodeURLString } from "./Helpers";
@@ -30,8 +29,8 @@ export default function StyleList<
   P extends DOMAttributes<T>,
   T extends Element
 >({ setSearchStyle }: StyleProps) {
-  const { loading, error, data } = useQuery(ALL_STYLES);
-  const classes = useStyles();
+  const { loading, data } = useQuery(ALL_STYLES);
+  useStyles();
 
   if (loading) return <div>Loadin</div>;
 

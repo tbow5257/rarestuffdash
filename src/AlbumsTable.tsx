@@ -2,19 +2,10 @@ import React from "react";
 import { useQuery } from "@apollo/client";
 import cloneDeep from "lodash/cloneDeep";
 import { makeStyles } from "@material-ui/core/styles";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
-import TableContainer from "@material-ui/core/TableContainer";
-import TablePagination from "@material-ui/core/TablePagination";
-import TableHead from "@material-ui/core/TableHead";
-import TableBody from "@material-ui/core/TableBody";
-import Table from "@material-ui/core/Table";
-import Paper from "@material-ui/core/Paper";
 import MaterialTable from "material-table";
-import { parse } from "query-string";
 
 import { ALL_ALBUMS } from "./Queries";
 import { decodeURLString } from "./Helpers";
-import StyleList from "./StyleList";
 
 interface Edge {
   node: Node;
@@ -30,14 +21,6 @@ interface Album {
   price: number;
 }
 
-const headCells: string[] = [
-  "releaseId",
-  "name",
-  "want",
-  "have",
-  "price",
-  "style",
-];
 
 type Order = "asc" | "desc";
 
@@ -54,19 +37,13 @@ interface AlbumsProps {
 }
 
 export default function AlbumsTable({ searchStyle }: AlbumsProps) {
-  const classes = useStyles();
-  console.log('serach', searchStyle);
-  const [selected, setSelected] = React.useState<string[]>([]);
-  const [page, setPage] = React.useState(0);
-  const [order, setOrder] = React.useState<Order>("desc");
-  const [orderBy, setOrderBy] = React.useState("have");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  useStyles();
   const [searchField, setSearchField] = React.useState("experimental");
 
   React.useEffect(() => {
     setSearchField(searchStyle)
   }, [searchStyle])
-  const { loading, error, data } = useQuery(ALL_ALBUMS);
+  const { loading, data } = useQuery(ALL_ALBUMS);
 
   if (loading) return <div>Load time</div>;
 
@@ -76,41 +53,6 @@ export default function AlbumsTable({ searchStyle }: AlbumsProps) {
     element.name = decodeURLString(element.name);
     element.style = decodeURLString(element.style);
   });
-
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: any
-  ) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  const createSortHandler = (property: any) => (
-    event: React.MouseEvent<unknown>
-  ) => {
-    handleRequestSort(event, property);
-  };
-
-  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: string[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelected(newSelected);
-  };
 
   return (
     <div>
