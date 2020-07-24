@@ -4,7 +4,7 @@ import cloneDeep from "lodash/cloneDeep";
 import { makeStyles } from "@material-ui/core/styles";
 import MaterialTable from "material-table";
 
-import { ALL_ALBUMS, SEARCH_ALBUMS_PAGINATE } from "./Queries";
+import { SEARCH_ALBUMS_PAGINATE } from "./Queries";
 import { decodeURLString } from "./Helpers";
 
 interface Edge {
