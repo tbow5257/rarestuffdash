@@ -38,26 +38,21 @@ interface AlbumsProps {
 
 export default function AlbumsTable({ searchStyle }: AlbumsProps) {
   useStyles();
-  const [searchField, setSearchField] = React.useState("experimental");
+  const [searchField, setSearchField] = React.useState("Bollywood");
 
   const clicky = () => {
     console.log('WHY');
     setSearchField('folk');
   }
 
-  // const { loading, data } = useQuery(ALL_ALBUMS);
 
   const { loading, error, data } = useQuery(SEARCH_ALBUMS_PAGINATE, { variables:
-    { "minHaveCount": 30, "maxHaveCount": 50, "first": 100, "skip": 0, "style":"Folk" }
+    { "minHaveCount": 5, "maxHaveCount": 1550, "first": 100, "skip": 0, "style":"Bollywood" }
   });
 
   console.log('error ', error);
   if (loading) return <div>Load time</div>;
 
-
-  console.log("huh ", data)
-
-  // const albumsCopy = cloneDeep(data.albums);
 
   const albumsCopy = cloneDeep(data.albumsByHave.edges);
 
@@ -73,14 +68,19 @@ export default function AlbumsTable({ searchStyle }: AlbumsProps) {
       <MaterialTable
         columns={[
           { title: "Release Id", field: "releaseId" },
-          { title: "Name", field: "name" },
+          { title: "Name", field: "name", render: rowData => {
+            const url = 'https://www.youtube.com/results?search_query=' + rowData.name;
+            return <a href={url} rel="noreferrer noopener"  target="_blank">{rowData.name}</a> 
+          } },
           { title: "# Want", field: "want" },
           { title: "# Have", field: "have" },
-          { title: "Rare Price", field: "price" },
+          { title: "Rare Price", field: "price", render: rowData => '$' + Math.round(rowData.price/100) },
           { title: "Style", field: "style" },
         ]}
         data={albumsCopy}
-        options={{ searchText: searchField }}
+        options={{ searchText: searchField, 
+                   pageSize: 20,
+                   pageSizeOptions: [20, 50, 100] }}
         title="Albums table"
       />
     </div>
