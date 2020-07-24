@@ -3,6 +3,7 @@ import { useQuery } from "@apollo/client";
 import cloneDeep from "lodash/cloneDeep";
 import { makeStyles } from "@material-ui/core/styles";
 import MaterialTable from "material-table";
+import Popper from '@material-ui/core/Popper';
 
 import { SEARCH_ALBUMS_PAGINATE } from "./Queries";
 import { decodeURLString } from "./Helpers";
@@ -39,15 +40,25 @@ interface AlbumsProps {
 export default function AlbumsTable({ searchStyle }: AlbumsProps) {
   useStyles();
   const [searchField, setSearchField] = React.useState("Bollywood");
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const clicky = () => {
     console.log('WHY');
     setSearchField('folk');
   }
 
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    console.log("event.currentTarget ", event.currentTarget);
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popper' : undefined;
+
+
 
   const { loading, error, data } = useQuery(SEARCH_ALBUMS_PAGINATE, { variables:
-    { "minHaveCount": 5, "maxHaveCount": 1550, "first": 100, "skip": 0, "style":"Bollywood" }
+    { "minHaveCount": 20, "maxHaveCount": 130, "first": 100, "skip": 0, "style":"Ambient" }
   });
 
   console.log('error ', error);
@@ -70,7 +81,19 @@ export default function AlbumsTable({ searchStyle }: AlbumsProps) {
           { title: "Release Id", field: "releaseId" },
           { title: "Name", field: "name", render: rowData => {
             const url = 'https://www.youtube.com/results?search_query=' + rowData.name;
-            return <a href={url} rel="noreferrer noopener"  target="_blank">{rowData.name}</a> 
+            return (
+              <div>
+                {/* href={url} */}
+              <p  aria-describedby={id}  
+                  onClick={handleClick}>{rowData.name}</p>
+              <Popper id={id} open={open} anchorEl={anchorEl}>
+                <div>
+                  <a href={url} rel="noreferrer noopener"  target="_blank">{rowData.name}</a> 
+                </div>
+                {/* TODO: className={classes.paper} */}
+              </Popper>
+            </div>
+            ) 
           } },
           { title: "# Want", field: "want" },
           { title: "# Have", field: "have" },
