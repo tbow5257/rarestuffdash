@@ -15,6 +15,7 @@ import {
 
 import { SEARCH_ALBUMS_PAGINATE } from "./Queries";
 import { decodeURLString } from "./Helpers";
+import NamePopper from './NamePopper';
 
 interface Edge {
   node: Node;
@@ -45,55 +46,15 @@ interface AlbumsProps {
   searchStyle: string;
 }
 
-const PopoverPopupState = ({name}: any) => {
-  const popupState = usePopupState({
-    variant: 'popover',
-    popupId: 'demoPopover',
-  })
-  return (
-    <div>
-      <Button variant="contained" {...bindTrigger(popupState)}>
-        {name}
-      </Button>
-      <Popover
-        {...bindPopover(popupState)}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
-      >
-        <Typography>
-        {name}{name}{name}
-        </Typography>
-      </Popover>
-    </div>
-  )
-}
-
 
 export default function AlbumsTable({ searchStyle }: AlbumsProps) {
   useStyles();
-  const [searchField, setSearchField] = React.useState("Bollywood");
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [searchField, setSearchField] = React.useState("");
 
   const clicky = () => {
     console.log('WHY');
     setSearchField('folk');
   }
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    console.log("event.currentTarget ", event.currentTarget);
-    setAnchorEl(anchorEl ? null : event.currentTarget);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popper' : undefined;
-
-
 
   const { loading, error, data } = useQuery(SEARCH_ALBUMS_PAGINATE, { variables:
     { "minHaveCount": 20, "maxHaveCount": 130, "first": 100, "skip": 0, "style":"Ambient" }
@@ -118,8 +79,11 @@ export default function AlbumsTable({ searchStyle }: AlbumsProps) {
         columns={[
           { title: "Release Id", field: "releaseId" },
           { title: "Name", field: "name", render: rowData => {
-            const url = 'https://www.youtube.com/results?search_query=' + rowData.name;
-            return <PopoverPopupState name={rowData.name} />
+            const youtubeURL = 'https://www.youtube.com/results?search_query=' + rowData.name;
+            const discogsURL = 'https://www.discogs.com/' + rowData.name + '/release/' + rowData.releaseId;
+            return <NamePopper name={rowData.name} 
+                      discogsURL={discogsURL} 
+                      youtubeURL={youtubeURL} />
           } },
           { title: "# Want", field: "want" },
           { title: "# Have", field: "have" },
