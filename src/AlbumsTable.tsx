@@ -2,8 +2,16 @@ import React from "react";
 import { useQuery } from "@apollo/client";
 import cloneDeep from "lodash/cloneDeep";
 import { makeStyles } from "@material-ui/core/styles";
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 import MaterialTable from "material-table";
 import Popper from '@material-ui/core/Popper';
+import Popover from '@material-ui/core/Popover'
+import {
+  usePopupState,
+  bindTrigger,
+  bindPopover,
+} from 'material-ui-popup-state/hooks'
 
 import { SEARCH_ALBUMS_PAGINATE } from "./Queries";
 import { decodeURLString } from "./Helpers";
@@ -36,6 +44,36 @@ const useStyles = makeStyles({
 interface AlbumsProps {
   searchStyle: string;
 }
+
+const PopoverPopupState = ({name}: any) => {
+  const popupState = usePopupState({
+    variant: 'popover',
+    popupId: 'demoPopover',
+  })
+  return (
+    <div>
+      <Button variant="contained" {...bindTrigger(popupState)}>
+        {name}
+      </Button>
+      <Popover
+        {...bindPopover(popupState)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Typography>
+        {name}{name}{name}
+        </Typography>
+      </Popover>
+    </div>
+  )
+}
+
 
 export default function AlbumsTable({ searchStyle }: AlbumsProps) {
   useStyles();
@@ -81,19 +119,7 @@ export default function AlbumsTable({ searchStyle }: AlbumsProps) {
           { title: "Release Id", field: "releaseId" },
           { title: "Name", field: "name", render: rowData => {
             const url = 'https://www.youtube.com/results?search_query=' + rowData.name;
-            return (
-              <div>
-                {/* href={url} */}
-              <p  aria-describedby={id}  
-                  onClick={handleClick}>{rowData.name}</p>
-              <Popper id={id} open={open} anchorEl={anchorEl}>
-                <div>
-                  <a href={url} rel="noreferrer noopener"  target="_blank">{rowData.name}</a> 
-                </div>
-                {/* TODO: className={classes.paper} */}
-              </Popper>
-            </div>
-            ) 
+            return <PopoverPopupState name={rowData.name} />
           } },
           { title: "# Want", field: "want" },
           { title: "# Have", field: "have" },
