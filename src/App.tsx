@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./App.css";
 import {
   ApolloClient,
@@ -7,7 +7,6 @@ import {
   ApolloProvider
 } from "@apollo/client";
 
-import AlbumsTable from './AlbumsTable';
 import StyleList from './StyleList';
 
 console.log(process.env)
@@ -21,13 +20,11 @@ const client = new ApolloClient({
 type SetStyle = string;
 
 function App() {
-  const [searchStyle, setSearchStyle] = useState<SetStyle>('');
   
   return (
     <ApolloProvider client={client}>
       <div className="App">
-        <StyleList setSearchStyle={setSearchStyle} />
-        <AlbumsTable searchStyle={searchStyle} />
+        <StyleList />
       </div>
     </ApolloProvider>
   );
