@@ -1,10 +1,9 @@
 import React from "react";
-import Typography from '@material-ui/core/Typography';
 import Popper from '@material-ui/core/Popper'
 import {
     usePopupState,
-    bindTrigger,
     bindPopper,
+    bindToggle
   } from 'material-ui-popup-state/hooks'
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
@@ -27,7 +26,7 @@ export default function NamePopper({name, youtubeURL, discogsURL}: PopoverPopupS
     })
     return (
       <div>
-        <Button variant="outlined" {...bindTrigger(popupState)}>
+        <Button variant="outlined" {...bindToggle(popupState)} >
           {name}
         </Button>
         <Popper
