@@ -2,16 +2,7 @@ import React from "react";
 import { useQuery } from "@apollo/client";
 import cloneDeep from "lodash/cloneDeep";
 import { makeStyles } from "@material-ui/core/styles";
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
 import MaterialTable from "material-table";
-import Popper from '@material-ui/core/Popper';
-import Popover from '@material-ui/core/Popover'
-import {
-  usePopupState,
-  bindTrigger,
-  bindPopover,
-} from 'material-ui-popup-state/hooks'
 
 import { SEARCH_ALBUMS_PAGINATE } from "./Queries";
 import { decodeURLString } from "./Helpers";
