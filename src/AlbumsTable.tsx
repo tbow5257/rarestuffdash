@@ -43,11 +43,10 @@ const useStyles = makeStyles({
 });
 
 interface AlbumsProps {
-  searchStyle: string;
+  style: string;
 }
 
-
-export default function AlbumsTable({ searchStyle }: AlbumsProps) {
+export default function AlbumsTable({ style }: AlbumsProps) {
   useStyles();
   const [searchField, setSearchField] = React.useState("");
 
@@ -57,7 +56,7 @@ export default function AlbumsTable({ searchStyle }: AlbumsProps) {
   }
 
   const { loading, error, data } = useQuery(SEARCH_ALBUMS_PAGINATE, { variables:
-    { "minHaveCount": 20, "maxHaveCount": 130, "first": 100, "skip": 0, "style":"Ambient" }
+    { "minHaveCount": 5, "maxHaveCount": 1550, "first": 100, "skip": 0, "style": style }
   });
 
   console.log('error ', error);
@@ -73,7 +72,7 @@ export default function AlbumsTable({ searchStyle }: AlbumsProps) {
 
   return (
     <div>
-      <div>{searchStyle}</div>
+      <div>{style}</div>
       <div onClick={clicky}>{data.albumsByHave.totalCount}</div>
       <MaterialTable
         columns={[

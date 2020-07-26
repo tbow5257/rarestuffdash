@@ -1,4 +1,4 @@
-import React, { Dispatch, DOMAttributes } from "react";
+import React, { Dispatch, DOMAttributes, useState } from "react";
 import { useQuery } from "@apollo/client";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableRow from "@material-ui/core/TableRow";
@@ -8,6 +8,7 @@ import cloneDeep from "lodash/cloneDeep";
 
 import { ALL_STYLES } from "./Queries";
 import { decodeURLString } from "./Helpers";
+import AlbumsTable from './AlbumsTable';
 
 interface Style {
   name: string;
@@ -22,14 +23,16 @@ const useStyles = makeStyles({
 });
 
 interface StyleProps {
-  setSearchStyle: Dispatch<SetStyle>;
+  setstyle: Dispatch<SetStyle>;
 }
 
 export default function StyleList<
   P extends DOMAttributes<T>,
   T extends Element
->({ setSearchStyle }: StyleProps) {
+>() {
   const { loading, data } = useQuery(ALL_STYLES);
+  const [style, setstyle] = useState<SetStyle>('Bollywood');
+
   useStyles();
 
   if (loading) return <div>Loadin</div>;
@@ -43,19 +46,22 @@ export default function StyleList<
   const clickStyle = (e: React.MouseEvent<HTMLElement>) => {
     const styleName = e.currentTarget.dataset.id || '';
     console.log(styleName)
-    setSearchStyle(styleName);
+    setstyle(styleName);
   }
     
 
   return (
-    <TableContainer>
-      <TableRow>
-        {stylesCopy.map((style: Style, i: number) => (
-          <TableCell onClick={clickStyle} data-id={style.name} key={i}>
-            {style.name}
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableContainer>
+    <>
+      <TableContainer>
+        <TableRow>
+          {stylesCopy.map((style: Style, i: number) => (
+            <TableCell onClick={clickStyle} data-id={style.name} key={i}>
+              {style.name}
+            </TableCell>
+          ))}
+        </TableRow>
+      </TableContainer>
+      {style && <AlbumsTable style={style} /> }
+    </>
   );
 }
