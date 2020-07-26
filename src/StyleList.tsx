@@ -5,6 +5,7 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import { makeStyles } from "@material-ui/core/styles";
 import cloneDeep from "lodash/cloneDeep";
+import orderBy from "lodash/orderBy";
 
 import { ALL_STYLES } from "./Queries";
 import { decodeURLString } from "./Helpers";
@@ -37,11 +38,14 @@ export default function StyleList<
 
   if (loading) return <div>Loadin</div>;
 
-  const stylesCopy = cloneDeep(data.styles);
+  
+  let stylesCopy = cloneDeep(data.styles);
 
   stylesCopy.forEach((style: Style) => {
     style.name = decodeURLString(style.name);
   });
+
+  stylesCopy = orderBy(stylesCopy, style => style.name);
 
   const clickStyle = (e: React.MouseEvent<HTMLElement>) => {
     const styleName = e.currentTarget.dataset.id || '';

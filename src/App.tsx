@@ -9,7 +9,6 @@ import {
 
 import StyleList from './StyleList';
 
-console.log(process.env)
 const client = new ApolloClient({
   cache: new InMemoryCache(),
   link: new HttpLink({
